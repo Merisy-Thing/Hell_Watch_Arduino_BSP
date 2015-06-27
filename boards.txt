@@ -1,0 +1,15 @@
+##############################################################
+
+hellwatch.name=Hell Watch
+
+hellwatch.build.mcu=atxmega32a4u
+hellwatch.build.f_cpu=16000000L
+hellwatch.build.core=xmega
+hellwatch.build.variant=HellWatch
+hellwatch.build.board=HELL_WATCH
+
+hellwatch.upload.tool=Hell_Watch_Updater
+hellwatch.upload.protocol=custom
+hellwatch.upload.maximum_size=32704
+
+hellwatch.bootloader.tool=: Needless

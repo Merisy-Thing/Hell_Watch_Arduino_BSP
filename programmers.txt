@@ -1,0 +1,4 @@
+hellwatchupdater.name=Hell Watch Updater
+dragonjtag.communication=usb
+hellwatchupdater.protocol=custom
+

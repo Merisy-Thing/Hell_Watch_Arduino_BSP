@@ -1,0 +1,46 @@
+#######################################
+# Syntax Coloring Map For HellWatch
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+HellWatch_Button	KEYWORD1
+HellWatch_Power	KEYWORD1
+HellWatch_Ext	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+systemPowerOff	KEYWORD2
+getBatteryVoltage	KEYWORD2
+analogSupplyCtrl	KEYWORD2
+beep	KEYWORD2
+
+getButton  KEYWORD2
+waitButtonUp  KEYWORD2
+
+AdcBegin	KEYWORD2
+AdcRead8	KEYWORD2
+AdcRead12	KEYWORD2
+AdcEnd	KEYWORD2
+
+DacBegin	KEYWORD2
+DacWrite	KEYWORD2
+DacEnd	KEYWORD2
+
+PortBegin	KEYWORD2
+PortPullUp	KEYWORD2
+PortPullDown	KEYWORD2
+PortRead	KEYWORD2
+PortWrite	KEYWORD2
+PortEnd	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
+
