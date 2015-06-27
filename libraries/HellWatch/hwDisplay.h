@@ -1,5 +1,5 @@
-#ifndef _HW_DISPLAY_h
-#define _HW_DISPLAY_h
+#ifndef _HW_DISPLAY_H
+#define _HW_DISPLAY_H
 
 #include <Arduino.h>
 #include <Print.h>

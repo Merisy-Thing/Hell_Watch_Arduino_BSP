@@ -1,5 +1,5 @@
 /*********************************************************************
-This is a library for Hell Watch Button
+This is a library for Hell Watch Switch
 
   ------> http://www.hellprototypes.com/
 
@@ -11,35 +11,29 @@ All text above, and the splash screen below must be included in any redistributi
 #include <util/delay.h>
 #include <stdlib.h>
 
-#include "hwButton.h"
+#include "hwInput.h"
 
 
 const uint8_t key_value_map[] = {
 	255, 231, 210, 186, 158, 126, 86, 0,
 };
 
-#define START_ADC()		(ADCA.CH1.CTRL |= 1 << 7)
+#define START_ADC()			(ADCA.CH1.CTRL |= 1 << 7)
 #define WAIT_CONVERT()		do{ while(!(ADCA.CH1.INTFLAGS & 0x01)); ADCA.CH1.INTFLAGS = 0x01;}while(0)
 
-void HellWatch_Button::begin(void)
+void Input::begin(void)
 {
-	//ADCA.CALL and ADCA.CALH was inited by bootloader
-
-	ADCA.CTRLB = 0x64;			// High current limit, signed mode, no free run, 8 bit
-	ADCA.PRESCALER = 0x07;		// Prescaler 512 (62.5kHZ ADC clock)
+	//ADCA was inited by bootloader
 	ADCA.CTRLA		  = 0x01;	// Enable ADC
-
-	ADCA.REFCTRL	  = 0x12;	// REF= VCC/1.6 (3.3V/1.6 = 2.0625V)
-	ADCA.CH1.MUXCTRL  = 0x08;	// Channel 1 input: ADC1 pin
-	ADCA.CH1.CTRL	  = 0x01;	// Single-ended positive input signal
 }
-uint8_t HellWatch_Button::getButton(void)
+
+uint8_t Input::getKey(void)
 {
 	uint8_t  adc0, key;
 
-    key = BTN_NONE;
+    key = SW_NONE;
 	if(PORTA.IN & (1 << 7)) {
-		key = BTN_MAIN;
+		key = SW_MAIN;
 	} else	{
 		START_ADC();
 		WAIT_CONVERT();
@@ -62,8 +56,10 @@ uint8_t HellWatch_Button::getButton(void)
 	return key;
 }
 
-void HellWatch_Button::waitButtonUp(void)
+void Input::waitKeyUp(void)
 {
     //FIXME: Add timeout return
-    while(getButton() != BTN_NONE);
+    while(getKey() != SW_NONE) {
+		delay(10);
+	}
 }

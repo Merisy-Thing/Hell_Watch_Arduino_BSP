@@ -14,12 +14,15 @@ All text above, and the splash screen below must be included in any redistributi
 #include <avr/pgmspace.h>
 
 #include <hwDisplay.h>
+#include <hwInput.h>
+#include <hwPower.h>
 
 class HellWatch : public Display
 {
  public:
 
-
+	Input input;
+	Power power;
  protected:
 
 };

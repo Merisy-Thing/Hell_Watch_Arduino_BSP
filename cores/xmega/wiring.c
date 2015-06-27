@@ -105,6 +105,9 @@ void init()
  	TCE0.INTCTRLA = 0x01; //LO Pri
  	TCE0.CTRLA = 0x04;//DIV 8,  2M
 
+	//Power save for adc key
+	ADCA.CTRLA = 0x00;
+
 	/* Enable interrupts.                */
 	PMIC.CTRL |= PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_HILVLEN_bm;
 	sei();

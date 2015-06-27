@@ -7,25 +7,31 @@ BSD license, check license.txt for more information
 All text above, and the splash screen below must be included in any redistribution
 
 *********************************************************************/
+#ifndef _HW_INPUT_H
+#define _HW_INPUT_H
 
 #include "Arduino.h"
 
-#define BTN_NONE				0
-#define BTN_BTM_LEFT			1
-#define BTN_BTM_RIGHT			2
-#define BTN_3WS_DOWN			3
-#define BTN_3WS_PUSH			4
-#define BTN_3WS_UP				5
-#define BTN_TOP_RIGHT			6
-#define BTN_TOP_LEFT			7
-#define BTN_MAIN				8
-#define BTN_WAIT_FLAG			0xFF
+#define SW_NONE					0
+#define SW_BTM_LEFT				1
+#define SW_BTM_RIGHT			2
+#define SW_3WS_DOWN				3
+#define SW_3WS_PUSH				4
+#define SW_3WS_UP				5
+#define SW_TOP_RIGHT			6
+#define SW_TOP_LEFT				7
+#define SW_MAIN					8
+#define SW_WAIT_FLAG			0xFF
 
-class HellWatch_Button {
+class Input {
  public:
 	void begin(void);
-	uint8_t getButton(void);
-    void waitButtonUp(void);
+
+	uint8_t getKey(void);
+    void waitKeyUp(void);
+
  protected:
 
 };
+
+#endif

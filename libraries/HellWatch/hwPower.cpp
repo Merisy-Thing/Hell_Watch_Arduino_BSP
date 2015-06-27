@@ -13,7 +13,7 @@ All text above, and the splash screen below must be included in any redistributi
 
 #include "hwPower.h"
 
-void HellWatch_Power::begin(void)
+void Power::begin(void)
 {
 	//ADC
 	ADCA.CH0.MUXCTRL  = 0x00;	// Channel 0 input: ADC0 pin
@@ -21,33 +21,20 @@ void HellWatch_Power::begin(void)
 
 	PORTA.PIN0CTRL	  = 0x07;  //Digital input buffer disabled
 
-	//Buzzer
-	uint16_t tone = 500;
-
-	TCD1.PER = tone * 2;
-	TCD1.CCB = (tone * 2) - (tone / 8);
-	//TCD1.CTRLC = 0x02;//Match cmp when timer turn off ( Turn off buzzing MOS)
-	TCD1.CTRLB = 0x23;//CCBEN, Single-slope PWM
+	ADCA.CTRLA		  = 0x01;	// Enable ADC
 }
 
-void HellWatch_Power::systemPowerOff(void)
+void Power::turnOff(void)
 {
 	PORTD.OUTCLR = 1 << 4;//Rest OLED
-	analogSupplyCtrl(0);
+	delay(10);
+	PORTA.OUTCLR = 1 << 2;//OLED power off
+	delay(10);
 	PORTA.OUTCLR = 1 << 6;//LDO lock disable
 	while(1);//wait loop for key main release
 }
 
-void HellWatch_Power::analogSupplyCtrl(uint8_t ctrl)
-{
-	if(ctrl) {
-		PORTA.OUTSET = 1 <<  2;
-	} else {
-		PORTA.OUTCLR = 1 <<  2;
-	}
-}
-
-uint16_t HellWatch_Power::getBatteryVoltage(void)
+uint16_t Power::getBatteryVoltage(void)
 {
     uint16_t voltage;
 
@@ -64,16 +51,5 @@ uint16_t HellWatch_Power::getBatteryVoltage(void)
 	ADCA.REFCTRL = old_ref;
 
     return voltage;
-}
-
-void HellWatch_Power::beep(uint16_t time)
-{
-	TCD1.CTRLA = 0x04;//DIV8, 2MHz
-
-	delay(time);
-
-	while(!(PORTD.IN & (1 << 5)));//waiting for pin high
-	while(PORTD.IN & (1 << 5));   //waiting for pin low
-	TCD1.CTRLA = 0x00;//OFF
 }
 
