@@ -12,7 +12,7 @@ All text above, and the splash screen below must be included in any redistributi
 #include <util/delay.h>
 #include <stdlib.h>
 
-#include "HellWatch_Ext.h"
+#include "hwExt.h"
 
 #define START_ADC_CH3()	(ADCA.CH3.CTRL |= 1 << 7)
 #define WAIT_CONVERT3()	do{ while(!(ADCA.CH3.INTFLAGS & 0x01)); ADCA.CH3.INTFLAGS = 0x01;}while(0)

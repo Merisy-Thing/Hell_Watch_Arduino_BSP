@@ -904,47 +904,6 @@ boolean Arduboy::not_pressed(uint8_t buttons)
 }
 
 
-uint8_t Arduboy::getInput()
-{
-  // using ports here is ~100 bytes smaller than digitalRead()
-  #ifdef DEVKIT
-  // down, left, up
-  uint8_t buttons = ((~PINB) & B01110000);
-  // right button
-  buttons = buttons | (((~PINC) & B01000000) >> 4);
-  // A and B
-  buttons = buttons | (((~PINF) & B11000000) >> 6);
-  #endif
-  
-  #ifdef HELL_WATCH
-  uint8_t buttons = 0;
-  if(PORTA.IN & (1 << 7)) {//Hell Watch Main key
-	  PORTA.OUTCLR = 1 << 6;//LDO lock disable
-  }
-  if (digitalRead(PIN_DOWN_BUTTON) == LOW) {
-	  buttons |= 1 << 6;
-  }
-  if (digitalRead(PIN_LEFT_BUTTON) == LOW) {
-	  buttons |= 1 << 5;
-  }
-  if (digitalRead(PIN_UP_BUTTON) == LOW) {
-	  buttons |= 1 << 4;
-  }
-  if (digitalRead(PIN_RIGHT_BUTTON) == LOW) {
-	  buttons |= 1 << 2;
-  }
-  if (digitalRead(PIN_A_BUTTON) == LOW) {
-	  buttons |= 1 << 1;
-  }
-  if (digitalRead(PIN_B_BUTTON) == LOW) {
-	  buttons |= 1 << 0;
-  }
-  #endif
-
-  // b0dlu0rab - see button defines in Arduboy.h
-  return buttons;
-}
-
 void Arduboy::swap(int16_t& a, int16_t& b) {
   int temp = a;
   a = b;

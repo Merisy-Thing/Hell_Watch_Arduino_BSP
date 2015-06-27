@@ -11,7 +11,7 @@ All text above, and the splash screen below must be included in any redistributi
 #include <util/delay.h>
 #include <stdlib.h>
 
-#include "HellWatch_Button.h"
+#include "hwButton.h"
 
 
 const uint8_t key_value_map[] = {
