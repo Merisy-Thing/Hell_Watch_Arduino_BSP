@@ -8,7 +8,7 @@ All text above, and the splash screen below must be included in any redistributi
 
 *********************************************************************/
 #include "hwDisplay.h"
-#include "glcdfont.c"
+
 /* Graphics */
 
 Display::Display()
@@ -484,8 +484,7 @@ void Display::drawSlowXYBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int1
 }
 
 
-void Display::drawChar
-(int16_t x, int16_t y, unsigned char c, uint8_t color, uint8_t bg, uint8_t size)
+void Display::drawChar(int16_t x, int16_t y, unsigned char c, uint8_t color, uint8_t bg, uint8_t size)
 {
    uint8_t font_6x8[6];
 
