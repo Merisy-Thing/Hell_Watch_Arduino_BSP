@@ -123,10 +123,10 @@ void loop() {
     if ((mpuIntStatus & 0x10) || fifoCount == 1024) {
         // reset so we can continue cleanly
         mpu.resetFIFO();
-		hell.clearDisplay();
-		hell.setCursor(0, 0);
-        hell.println(F("FIFO overflow!"));
-		hell.display();
+		//hell.clearDisplay();
+		//hell.setCursor(0, 0);
+        //hell.println(F("FIFO overflow!"));
+		//hell.display();
 
     // otherwise, check for DMP data ready interrupt (this should happen frequently)
     } else if (mpuIntStatus & 0x02) {
