@@ -115,7 +115,7 @@ uint16_t AppFlashClass::read (uint32_t addr,uint8_t *buf,uint16_t n)
     buf[i] = transfer(0x00);
   }
   deselect();
-  
+
   return n;
 }
 
@@ -153,28 +153,3 @@ void AppFlashClass::erase32kBlock(uint32_t addr_start)
   transfer(addr_start);
   deselect();
 }
-
-bool AppFlash::begin()
-{
-  SPIPortSettings spiPort(&SPI_PORT, SPI_ROM_SS, SPI_MOSI, SPI_MISO, SPI_SCK);
-
-  spi.setConfiguration(spiPort);
-
-  spi.begin();
-  spi.setBitOrder(MSBFIRST);
-  spi.setClockDivider(SPI_CLOCK_DIV2);
-  spi.setDataMode(SPI_MODE0);
-  deselect();
-  //Serial.println("SPI OK");
-
-  return AppFlashClass::begin();
-}
-
-void AppFlash::end()
-{
-  AppFlashClass::end();
-  spi.end();
-}
-
-
-

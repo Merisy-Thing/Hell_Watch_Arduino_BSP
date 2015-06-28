@@ -6,7 +6,29 @@
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <limits.h>
+#include <./utility/appFlash.h>
 
+//=======================================
+//All ASCII chars
+#define FONT_6X8_BASE		0x0C4200
+
+//All ASCII chars
+#define FONT_8X16_BASE		0x0FCF00
+
+//All ASCII chars
+#define FONT_12X24_BASE		0x0FD4F0
+
+//Number: 0~9
+#define FONT_16X32_BASE0	0x0C5BA0
+
+//Chars: A~Z a~z : .
+#define FONT_16X32_BASE1	0x0FE250
+
+//GB2312
+#define FONT_HZ_BASE0		0x0C0000
+#define FONT_HZ_BASE1		0x0C69C0
+
+//=======================================
 
 #define PIXEL_SAFE_MODE
 
@@ -57,6 +79,9 @@ public:
   uint8_t height();
   virtual size_t write(uint8_t);
   void swap(int16_t& a, int16_t& b);
+
+  void contrast(uint8_t contrast);
+  virtual void flashRead(uint32_t, uint8_t*, uint16_t) = 0;
 
 private:
   unsigned char sBuffer[(HEIGHT*WIDTH)/8];

@@ -17,7 +17,7 @@ All text above, and the splash screen below must be included in any redistributi
 #include <hwInput.h>
 #include <hwPower.h>
 #include <hwExtPort.h>
-#include <./utility/appFlash.h>
+#include <hwFlash.h>
 
 class HellWatch : public Display
 {
@@ -27,8 +27,9 @@ class HellWatch : public Display
 	Input input;
 	Power power;
 	ExtPort extPort;
-	AppFlash appFlash;
+	Flash flash;
 
+	virtual void flashRead(uint32_t addr, uint8_t *buf, uint16_t n);
  protected:
 
 };

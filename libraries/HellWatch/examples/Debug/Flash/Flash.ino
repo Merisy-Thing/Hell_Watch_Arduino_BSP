@@ -11,7 +11,7 @@ void setup(){
 
 	hell.setCursor(0, 0);
 	hell.print("MF:0x");
-	hell.println(hell.appFlash.readManufacturer(), HEX);
+	hell.println(hell.flash.readManufacturer(), HEX);
 	hell.display();
 }
 
@@ -28,7 +28,7 @@ void loop(){
 	}
 	delay(50);
 
-	hell.appFlash.read(addr, &buf, 1);
+	hell.flash.read(addr, &buf, 1);
 
 	hell.clearDisplay();
 	hell.setCursor(0, 8);

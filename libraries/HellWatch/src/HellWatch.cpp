@@ -15,5 +15,10 @@ All text above, and the splash screen below must be included in any redistributi
 
 HellWatch::HellWatch()
 {
-	appFlash.begin();
+	flash.begin();
+}
+
+void HellWatch::flashRead(uint32_t addr, uint8_t *buf, uint16_t n)
+{
+	flash.read(addr, buf, n);
 }

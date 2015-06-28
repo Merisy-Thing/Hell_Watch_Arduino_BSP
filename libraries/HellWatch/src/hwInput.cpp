@@ -1,5 +1,5 @@
 /*********************************************************************
-This is a library for Hell Watch Switch
+This is a library for Hell Watch Input
 
   ------> http://www.hellprototypes.com/
 

@@ -38,27 +38,6 @@ protected:
   
 };
 
-class AppFlash: public AppFlashClass {
-private:
-  SPIClass spi;
-
-  inline void select() {
-    digitalWrite(SPI_ROM_SS,LOW);
-  }
-
-  inline uint8_t transfer(uint8_t x) {
-    byte y = spi.transfer(x);
-    return y;
-  }
-
-  inline void deselect() {
-    digitalWrite(SPI_ROM_SS,HIGH);
-  }
-
-public:
-  bool begin();
-  void end();
-};
 
 #endif
 

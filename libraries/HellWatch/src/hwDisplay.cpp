@@ -1,3 +1,12 @@
+/*********************************************************************
+This is a library for Hell Watch OLED Display
+
+  ------> http://www.hellprototypes.com/
+
+BSD license, check license.txt for more information
+All text above, and the splash screen below must be included in any redistribution
+
+*********************************************************************/
 #include "hwDisplay.h"
 #include "glcdfont.c"
 /* Graphics */
@@ -478,6 +487,7 @@ void Display::drawSlowXYBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int1
 void Display::drawChar
 (int16_t x, int16_t y, unsigned char c, uint8_t color, uint8_t bg, uint8_t size)
 {
+   uint8_t font_6x8[6];
 
   if ((x >= WIDTH) ||         // Clip right
     (y >= HEIGHT) ||        // Clip bottom
@@ -487,18 +497,13 @@ void Display::drawChar
   {
     return;
   }
+  
 
+  flashRead(FONT_6X8_BASE + ((uint16_t)(c - ' ') * 6), font_6x8, 6);
+  
   for (int8_t i=0; i<6; i++ )
   {
-    uint8_t line;
-    if (i == 5)
-    {
-      line = 0x0;
-    }
-    else
-    {
-      line = pgm_read_byte(font+(c*5)+i);
-    }
+    uint8_t line = font_6x8[i];
 
     for (int8_t j = 0; j<8; j++)
     {
@@ -586,16 +591,10 @@ void Display::drawScreen(const unsigned char *image)
   digitalWrite(CS, HIGH);
 }
 
+#define BL_API_OLED_DRAW        (*((void(*)(uint8_t * draw_buffer))(0x08FFE/2)))
 void Display::drawScreen(unsigned char image[])
 {
-  digitalWrite(CS, HIGH);
-  digitalWrite(DC, HIGH);
-  digitalWrite(CS, LOW);
-  for (int a = 0; a < (HEIGHT*WIDTH)/8; a++)
-  {
-    oled_transfer(image[a]);
-  }
-  digitalWrite(CS, HIGH);
+	BL_API_OLED_DRAW(image);
 }
 
 inline unsigned char* Display::getBuffer(){
@@ -610,4 +609,10 @@ void Display::swap(int16_t& a, int16_t& b) {
   int temp = a;
   a = b;
   b = temp;
+}
+
+#define BL_API_OLED_CONTRAST   (*((void(*)(uint8_t))(0x08FFA/2)))
+void Display::contrast(uint8_t contrast)
+{
+	BL_API_OLED_CONTRAST(contrast);
 }
