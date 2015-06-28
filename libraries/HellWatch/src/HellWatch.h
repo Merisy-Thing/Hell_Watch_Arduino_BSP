@@ -17,14 +17,17 @@ All text above, and the splash screen below must be included in any redistributi
 #include <hwInput.h>
 #include <hwPower.h>
 #include <hwExtPort.h>
+#include <./utility/appFlash.h>
 
 class HellWatch : public Display
 {
  public:
+	HellWatch();
 
 	Input input;
 	Power power;
 	ExtPort extPort;
+	AppFlash appFlash;
 
  protected:
 

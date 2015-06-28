@@ -13,3 +13,7 @@ All text above, and the splash screen below must be included in any redistributi
 
 #include "HellWatch.h"
 
+HellWatch::HellWatch()
+{
+	appFlash.begin();
+}

@@ -62,6 +62,14 @@ static const uint8_t SCL 	= 9;
 
 #define SPI_PORT			SPIC
 
+#define SPI_MOSI			13
+#define SPI_MISO			14
+#define SPI_SCK				15
+
+#define SPI_ROM_SS			25
+#define SPI_BT_NREQ			26
+#define SPI_NRF_CSN			12
+
 #ifdef ARDUINO_MAIN
 
 // these arrays map port names (e.g. port B) to the
@@ -88,7 +96,7 @@ const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
 		PB,/*  7 : PB0 : EXT ADC8		*/
 		PC,/*  8 : PC0 : SDA			*/
 		PC,/*  9 : PC1 : SCL			*/
-		PC,/* 10 : PC2 : NRF_IRQ		*/
+		PC,/* 10 : PC2 : NRDY		*/
 		PC,/* 11 : PC3 : NRF_CE		*/
 		PC,/* 12 : PC4 : NRF_CSN		*/
 		PC,/* 13 : PC5 : MOSI			*/
@@ -104,7 +112,7 @@ const uint8_t PROGMEM digital_pin_to_port_PGM[] = {
 		PA,/* 23 : PA1 : KEY_ADC		*/
 		PA,/* 24 : PA2 : ADC_EN		*/
 		PA,/* 25 : PA3 : ROM_CS		*/
-		PA,/* 26 : PA4 : VIBATOR : 1=ON, 0:OFF				*/
+		PA,/* 26 : PA4 : NREQ : 1=ON, 0:OFF				*/
 		PA,/* 27 : PA5 : RTC_ACC_INT						*/
 		PA,/* 28 : PA6 : PWR_LOCK: 1=Power ON, 0: Power OFF	*/
 		PA,/* 29 : PA7 : KEY_MAIN: 1=Key Down, 0: Key Up		*/
