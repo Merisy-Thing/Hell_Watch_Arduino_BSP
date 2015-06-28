@@ -56,7 +56,9 @@ static const uint8_t SCL 	= 9;
 
 #define OLED_DC 			18
 #define OLED_CS 			16
-#define OLED_RESET 		20		
+#define OLED_RST 			20
+
+#define RTC_MPU_INT			27	//Pulled UP, Active: Low Level
 
 #define SPI_PORT			SPIC
 

@@ -15,7 +15,7 @@ void setup(){
 }
 
 void loop(){
-	uint8_t key = hell.input.getKey();
+	uint8_t key = hell.input.getInput();
 	if(key == SW_3WS_PUSH) {
 		hell.power.turnOff();
 	}

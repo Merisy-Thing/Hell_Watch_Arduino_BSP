@@ -10,9 +10,9 @@
 
 #define PIXEL_SAFE_MODE
 
-#define CS 16
-#define DC 18
-#define RST 20
+#define CS  OLED_CS
+#define DC  OLED_DC
+#define RST OLED_RST
 
 #define WIDTH 128
 #define HEIGHT 64

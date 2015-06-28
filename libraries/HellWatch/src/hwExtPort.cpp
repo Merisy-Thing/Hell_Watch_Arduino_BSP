@@ -12,12 +12,12 @@ All text above, and the splash screen below must be included in any redistributi
 #include <util/delay.h>
 #include <stdlib.h>
 
-#include "hwExt.h"
+#include "hwExtPort.h"
 
 #define START_ADC_CH3()	(ADCA.CH3.CTRL |= 1 << 7)
 #define WAIT_CONVERT3()	do{ while(!(ADCA.CH3.INTFLAGS & 0x01)); ADCA.CH3.INTFLAGS = 0x01;}while(0)
 
-void HellWatch_Ext::AdcBegin(uint8_t pin)//Pin7(PB0):ADC8, Pin6(PB1):ADC9, Pin5(PB2):ADC10, Pin4(PB3):ADC11
+void ExtPort::AdcBegin(uint8_t pin)//Pin7(PB0):ADC8, Pin6(PB1):ADC9, Pin5(PB2):ADC10, Pin4(PB3):ADC11
 {
 	if(pin == 7) {
 		PORTB.DIRCLR = 1 << 0;
@@ -43,7 +43,7 @@ void HellWatch_Ext::AdcBegin(uint8_t pin)//Pin7(PB0):ADC8, Pin6(PB1):ADC9, Pin5(
 
 	ADCA.CH3.CTRL	= 0x01;
 }
-uint8_t HellWatch_Ext::AdcRead8(uint8_t pin)
+uint8_t ExtPort::AdcRead8(uint8_t pin)
 {
 	uint8_t adc_val;
 	uint8_t old_refctrl = ADCA.REFCTRL;
@@ -60,7 +60,7 @@ uint8_t HellWatch_Ext::AdcRead8(uint8_t pin)
 	return adc_val;
 }
 
-uint16_t HellWatch_Ext::AdcRead12(uint8_t pin)
+uint16_t ExtPort::AdcRead12(uint8_t pin)
 {
 	uint16_t adc_val;
 	uint8_t old_refctrl = ADCA.REFCTRL;
@@ -81,7 +81,7 @@ uint16_t HellWatch_Ext::AdcRead12(uint8_t pin)
 	return adc_val;
 }
 
-void HellWatch_Ext::AdcEnd(uint8_t pin)
+void ExtPort::AdcEnd(uint8_t pin)
 {
 	if(pin == 7) {
 		PORTB.PIN0CTRL	  = 0x00;  //Digital input buffer disabled
@@ -97,15 +97,15 @@ void HellWatch_Ext::AdcEnd(uint8_t pin)
 }
 //====================================================================
 //TODO
-void HellWatch_Ext::DacBegin(uint8_t pin)//Pin4:DAC1, Pin5:DAC0
+void ExtPort::DacBegin(uint8_t pin)//Pin4:DAC1, Pin5:DAC0
 {
 
 }
-void HellWatch_Ext::DacWrite(uint8_t pin, uint16_t data)
+void ExtPort::DacWrite(uint8_t pin, uint16_t data)
 {
 
 }
-void HellWatch_Ext::DacEnd(uint8_t pin)
+void ExtPort::DacEnd(uint8_t pin)
 {
 
 }
@@ -114,17 +114,17 @@ void HellWatch_Ext::DacEnd(uint8_t pin)
 static const uint8_t PROGMEM swap[] {
 	0x00, 0x80, 0x40, 0xc0, 0x20, 0xa0, 0x60, 0xe0, 0x10, 0x90, 0x50, 0xd0, 0x30, 0xb0, 0x70, 0xf0,
 };
-uint8_t HellWatch_Ext::h_bits_swap(uint8_t data)
+uint8_t ExtPort::h_bits_swap(uint8_t data)
 {
 	return (data & 0x0F) | pgm_read_byte(swap + (data >> 4));
 }
-void HellWatch_Ext::PortBegin(uint8_t dir_mask)
+void ExtPort::PortBegin(uint8_t dir_mask)
 {
 	dir_mask = h_bits_swap(dir_mask);
 	PORTE.DIR = dir_mask & 0x0F;
 	PORTB.DIR = dir_mask >> 4;
 }
-void HellWatch_Ext::PortPullUp(uint8_t mask)
+void ExtPort::PortPullUp(uint8_t mask)
 {
 	mask = h_bits_swap(mask);
 	if((mask & 0x0F) > 0) {
@@ -136,7 +136,7 @@ void HellWatch_Ext::PortPullUp(uint8_t mask)
 		PORTB.PIN0CTRL = 0x18;
 	}
 }
-void HellWatch_Ext::PortPullDown(uint8_t mask)
+void ExtPort::PortPullDown(uint8_t mask)
 {
 	mask = h_bits_swap(mask);
 	if((mask & 0x0F) > 0) {
@@ -148,11 +148,11 @@ void HellWatch_Ext::PortPullDown(uint8_t mask)
 		PORTB.PIN0CTRL = 0x10;
 	}
 }
-uint8_t HellWatch_Ext::PortRead(void)
+uint8_t ExtPort::PortRead(void)
 {
 	return 	h_bits_swap( ((PORTB.IN & 0x0F) << 4) | (PORTE.IN & 0x0F) );
 }
-void HellWatch_Ext::PortWrite(uint8_t data)
+void ExtPort::PortWrite(uint8_t data)
 {
 	uint8_t de, db;
 	data = h_bits_swap(data);
@@ -161,7 +161,7 @@ void HellWatch_Ext::PortWrite(uint8_t data)
 	PORTE.OUT = de;
 	PORTB.OUT = db;
 }
-void HellWatch_Ext::PortEnd(uint8_t mask)
+void ExtPort::PortEnd(uint8_t mask)
 {
 	mask = h_bits_swap(mask);
 	if((mask & 0x0F) > 0) {

@@ -164,6 +164,8 @@ extern TwoWire Wire;
 #define F_CPU 32000000UL
 #endif
 
+#define BUFFER_LENGTH 32
+
 class xmWire : public Stream {
  public:
     /** 

@@ -27,8 +27,8 @@ class Input {
  public:
 	void begin(void);
 
-	uint8_t getKey(void);
-    void waitKeyUp(void);
+	uint8_t getInput(void);
+    void waitUp(void);
 
  protected:
 

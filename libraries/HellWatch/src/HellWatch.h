@@ -16,6 +16,7 @@ All text above, and the splash screen below must be included in any redistributi
 #include <hwDisplay.h>
 #include <hwInput.h>
 #include <hwPower.h>
+#include <hwExtPort.h>
 
 class HellWatch : public Display
 {
@@ -23,6 +24,8 @@ class HellWatch : public Display
 
 	Input input;
 	Power power;
+	ExtPort extPort;
+
  protected:
 
 };

@@ -13,10 +13,10 @@ void setup(){
 }
 
 void loop(){
-	uint8_t key = hell.input.getKey();
-	if(key != SW_NONE) {
+	uint8_t sw = hell.input.getInput();
+	if(sw != SW_NONE) {
 		hell.setCursor(16, 24);
-		hell.print(key);
+		hell.print(sw);
 		hell.display();
 	}
 }

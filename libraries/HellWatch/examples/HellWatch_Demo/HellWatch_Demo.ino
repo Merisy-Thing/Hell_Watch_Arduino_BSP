@@ -50,10 +50,10 @@ void loop(){
 	display.print(power.getBatteryVoltage());
 
 	display.print("  btn=");
-	uint8_t key = button.getButton();
-	display.println(key);
+	uint8_t sw = button.getButton();
+	display.println(sw);
 
-	if(key == BTN_BTM_RIGHT) {
+	if(sw == BTN_BTM_RIGHT) {
 		display.clearDisplay();
 		display.print("Power OFF");
 		display.display();

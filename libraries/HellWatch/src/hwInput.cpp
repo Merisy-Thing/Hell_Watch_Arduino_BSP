@@ -27,13 +27,13 @@ void Input::begin(void)
 	ADCA.CTRLA		  = 0x01;	// Enable ADC
 }
 
-uint8_t Input::getKey(void)
+uint8_t Input::getInput(void)
 {
-	uint8_t  adc0, key;
+	uint8_t  adc0, sw;
 
-    key = SW_NONE;
+    sw = SW_NONE;
 	if(PORTA.IN & (1 << 7)) {
-		key = SW_MAIN;
+		sw = SW_MAIN;
 	} else	{
 		START_ADC();
 		WAIT_CONVERT();
@@ -43,8 +43,8 @@ uint8_t Input::getKey(void)
 			START_ADC();
 			WAIT_CONVERT();
             if(adc0 - ADCA.CH1.RESL < 2) {
-				for(key = 0; key < 7; key++) {
-					if(adc0 >= key_value_map[key]) {
+				for(sw = 0; sw < 7; sw++) {
+					if(adc0 >= key_value_map[sw]) {
                         delay(20);
 						break;
 					}
@@ -53,13 +53,13 @@ uint8_t Input::getKey(void)
 		}
 	}
 
-	return key;
+	return sw;
 }
 
-void Input::waitKeyUp(void)
+void Input::waitUp(void)
 {
     //FIXME: Add timeout return
-    while(getKey() != SW_NONE) {
+    while(getInput() != SW_NONE) {
 		delay(10);
 	}
 }

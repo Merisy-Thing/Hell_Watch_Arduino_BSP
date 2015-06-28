@@ -7,12 +7,22 @@ BSD license, check license.txt for more information
 All text above, and the splash screen below must be included in any redistribution
 
 *********************************************************************/
+#ifndef _HW_EXTPORT_H
+#define _HW_EXTPORT_H
 
 #include "Arduino.h"
 
-class HellWatch_Ext {
+/* Pin 0 : PE0 : EXT SDA		*/
+/* Pin 1 : PE1 : EXT SCL/XCK0	*/
+/* Pin 2 : PE2 : EXT RXD0		*/
+/* Pin 3 : PE3 : EXT TXD0		*/
+/* Pin 4 : PB3 : EXT DAC1		*/
+/* Pin 5 : PB2 : EXT DAC0		*/
+/* Pin 6 : PB1 : EXT ADC9		*/
+/* Pin 7 : PB0 : EXT ADC8		*/
+
+class ExtPort {
  public:
-	//Pin7(PB0):ADC8, Pin6(PB1):ADC9, Pin5(PB2):ADC10, Pin4(PB3):ADC11
 	void AdcBegin(uint8_t pin);
 	uint8_t AdcRead8(uint8_t pin);
 	uint16_t AdcRead12(uint8_t pin);
@@ -32,3 +42,4 @@ class HellWatch_Ext {
  protected:
 	 uint8_t h_bits_swap(uint8_t data);
 };
+#endif
