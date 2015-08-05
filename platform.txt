@@ -2,7 +2,7 @@
 # Xmegaduino compile variables
 # --------------------- 
 
-name=Hell Watch Boards
+name=Hell Prototypes Boards
 version=0.1.0
 
 # AVR compile variables
