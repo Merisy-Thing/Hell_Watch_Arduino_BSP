@@ -39,6 +39,9 @@ const uint8_t gamebuinoLogo[] PROGMEM =
 };
 
 void Gamebuino::begin() {
+#ifdef HELL_WATCH
+    SPI.begin();//For read setting from SPI Flash chip
+#endif
 	timePerFrame = 50;
 	//nextFrameMillis = 0;
 	//frameCount = 0;

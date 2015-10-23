@@ -220,7 +220,7 @@ void Display::fillScreen(uint8_t color) {
 }
 
 void Display::update(void) {
-	frameCount ++;
+	frameCount++;
 #ifdef HELL_WATCH
 	digitalWrite(cs, HIGH);
 	digitalWrite(dc, HIGH);
