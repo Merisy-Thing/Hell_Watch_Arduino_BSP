@@ -1,191 +1,30 @@
 #include "Arduboy.h"
 #include "glcdfont.c"
 
-Arduboy::Arduboy() { }
+
+Arduboy::Arduboy() {
+  frameRate = 60;
+  frameCount = 0;
+  eachFrameMillis = 1000/60;
+  lastFrameStart = 0;
+  nextFrameStart = 0;
+  post_render = false;
+  lastFrameDurationMs = 0;
+  
+  cursor_x = 0;
+  cursor_y = 0;
+  textsize = 1;
+}
 
 void Arduboy::start()
 {
-#ifdef HELL_WATCH
-	USARTD0.BAUDCTRLA = 0x00;//speed up spi rate to 8M bps
-	pinMode(PIN_UP_BUTTON, INPUT_PULLUP);
-	pinMode(PIN_RIGHT_BUTTON, INPUT_PULLUP);
-	pinMode(PIN_DOWN_BUTTON, INPUT_PULLUP);
-	pinMode(PIN_LEFT_BUTTON, INPUT_PULLUP);
-	pinMode(PIN_A_BUTTON, INPUT_PULLUP);
-	pinMode(PIN_B_BUTTON, INPUT_PULLUP);
-	tunes.initChannel(PIN_SPEAKER_1);
-#else
-  #if F_CPU == 8000000L
-  slowCPU();
-  #endif
+  boot(); // required
 
-  SPI.begin();
-  pinMode(DC, OUTPUT);
-  pinMode(CS, OUTPUT);
-  pinMode(PIN_LEFT_BUTTON, INPUT_PULLUP);
-  pinMode(PIN_RIGHT_BUTTON, INPUT_PULLUP);
-  pinMode(PIN_UP_BUTTON, INPUT_PULLUP);
-  pinMode(PIN_DOWN_BUTTON, INPUT_PULLUP);
-  pinMode(PIN_A_BUTTON, INPUT_PULLUP);
-  pinMode(PIN_B_BUTTON, INPUT_PULLUP);
+  // Audio
   tunes.initChannel(PIN_SPEAKER_1);
   tunes.initChannel(PIN_SPEAKER_2);
-
-
-  csport = portOutputRegister(digitalPinToPort(CS));
-  cspinmask = digitalPinToBitMask(CS);
-  dcport = portOutputRegister(digitalPinToPort(DC));
-  dcpinmask = digitalPinToBitMask(DC);
-
-  /**
-   * Setup reset pin direction (used by both SPI and I2C)
-   */
-  pinMode(RST, OUTPUT);
-  digitalWrite(RST, HIGH);
-  delay(1);           // VDD (3.3V) goes high at start, lets just chill for a ms
-  digitalWrite(RST, LOW);   // bring reset low
-  delay(10);          // wait 10ms
-  digitalWrite(RST, HIGH);  // bring out of reset
-
-  bootLCD();
-
-  #ifdef SAFE_MODE
-  if (pressed(LEFT_BUTTON+UP_BUTTON))
-    safeMode();
-  #endif
-#endif
-
   audio.setup();
-  saveMuchPower();
 }
-
-#ifdef HELL_WATCH
-void Arduboy::oled_transfer(uint8_t c)
-{
-    USARTD0.DATA= c;  
-	while(!(USARTD0.STATUS & (1 << 6)));  
-	USARTD0.STATUS |= 1 <<6;
-}
-#endif
-
-#if F_CPU == 8000000L
-// if we're compiling for 8Mhz we need to slow the CPU down because the
-// hardware clock on the Arduboy is 16MHz
-void Arduboy::slowCPU()
-{
-  uint8_t oldSREG = SREG;
-  cli();                // suspend interrupts
-  CLKPR = _BV(CLKPCE);  // allow reprogramming clock
-  CLKPR = 1;            // set clock divisor to 2 (0b0001)
-  SREG = oldSREG;       // restore interrupts
-}
-#endif
-
-void Arduboy::bootLCD()
-{
-#ifndef HELL_WATCH
-  LCDCommandMode();
-  SPI.transfer(0xAE);  // Display Off
-  SPI.transfer(0XD5);  // Set Display Clock Divisor v
-  SPI.transfer(0xF0);  //   0x80 is default
-  SPI.transfer(0xA8);  // Set Multiplex Ratio v
-  SPI.transfer(0x3F);
-  SPI.transfer(0xD3);  // Set Display Offset v
-  SPI.transfer(0x0);
-  SPI.transfer(0x40);  // Set Start Line (0)
-  SPI.transfer(0x8D);  // Charge Pump Setting v
-  SPI.transfer(0x14);  //   Enable
-  // why are we running this next pair twice?
-  SPI.transfer(0x20);  // Set Memory Mode v
-  SPI.transfer(0x00);  //   Horizontal Addressing
-  SPI.transfer(0xA1);  // Set Segment Re-map (A0) | (b0001)
-  SPI.transfer(0xC8);  // Set COM Output Scan Direction
-  SPI.transfer(0xDA);  // Set COM Pins v
-  SPI.transfer(0x12);
-  SPI.transfer(0x81);  // Set Contrast v
-  SPI.transfer(0xCF);
-  SPI.transfer(0xD9);  // Set Precharge
-  SPI.transfer(0xF1);
-  SPI.transfer(0xDB);  // Set VCom Detect
-  SPI.transfer(0x40);
-  SPI.transfer(0xA4);  // Entire Display ON
-  SPI.transfer(0xA6);  // Set normal/inverse display
-  SPI.transfer(0xAF);  // Display On
-
-  LCDCommandMode();
-  SPI.transfer(0x20);     // set display mode
-  SPI.transfer(0x00);     // horizontal addressing mode
-
-  SPI.transfer(0x21);     // set col address
-  SPI.transfer(0x00);
-  SPI.transfer(COLUMN_ADDRESS_END);
-
-  SPI.transfer(0x22); // set page address
-  SPI.transfer(0x00);
-  SPI.transfer(PAGE_ADDRESS_END);
-#endif
-  LCDDataMode();
-}
-
-// Safe Mode is engaged by holding down both the LEFT button and UP button
-// when plugging the device into USB.  It puts your device into a tight
-// loop and allows it to be reprogrammed even if you have uploaded a very
-// broken sketch that interferes with the normal USB triggered auto-reboot
-// functionality of the device.
-void Arduboy::safeMode()
-{
-  display(); // too avoid random gibberish
-  while (true) {
-    asm volatile("nop \n");
-  }
-}
-
-void Arduboy::LCDDataMode()
-{
-#ifdef HELL_WATCH
-    digitalWrite(DC, LOW);
-#else
-  *dcport |= dcpinmask;
-  *csport &= ~cspinmask;
-#endif
-}
-
-void Arduboy::LCDCommandMode()
-{
-#ifdef HELL_WATCH
-    digitalWrite(DC, HIGH);
-#else
-  *csport |= cspinmask; // why are we doing this twice?
-  *csport |= cspinmask;
-  *dcport &= ~dcpinmask;
-  *csport &= ~cspinmask;
-#endif
-}
-
-
-/* Power Management */
-
-void Arduboy::idle()
-{
-  set_sleep_mode(SLEEP_MODE_IDLE);
-  sleep_mode();
-}
-
-void Arduboy::saveMuchPower()
-{
-#ifndef HELL_WATCH
-  power_adc_disable();
-  power_usart0_disable();
-  power_twi_disable();
-  // timer 0 is for millis()
-  // timers 1 and 3 are for music and sounds
-  power_timer2_disable();
-  power_usart1_disable();
-  // we need USB, for now (to allow triggered reboots to reprogram)
-  // power_usb_disable()
-#endif
-}
-
 
 /* Frame management */
 
@@ -193,6 +32,11 @@ void Arduboy::setFrameRate(uint8_t rate)
 {
   frameRate = rate;
   eachFrameMillis = 1000/rate;
+}
+
+bool Arduboy::everyXFrames(uint8_t frames)
+{
+  return frameCount % frames == 0;
 }
 
 bool Arduboy::nextFrame()
@@ -267,7 +111,7 @@ uint16_t Arduboy::rawADC(byte adc_bits)
   ADCSRA |= _BV(ADSC); // Start conversion
   while (bit_is_set(ADCSRA,ADSC)); // measuring
 
-  return ADCW;
+  return ADC;
 #else
   return 0;
 #endif
@@ -276,20 +120,33 @@ uint16_t Arduboy::rawADC(byte adc_bits)
 
 /* Graphics */
 
-void Arduboy::blank()
-{
-#ifdef HELL_WATCH
-  digitalWrite(CS, LOW);
-  for (int a = 0; a < (HEIGHT*WIDTH)/8; a++) oled_transfer(0x00);
-  digitalWrite(CS, HIGH);
-#else
-  for (int a = 0; a < (HEIGHT*WIDTH)/8; a++) SPI.transfer(0x00);
-#endif
-}
-
 void Arduboy::clearDisplay()
 {
-  for (int a = 0; a < (HEIGHT*WIDTH)/8; a++) sBuffer[a] = 0x00;
+  // C version:
+  // for (int a = 0; a < (HEIGHT*WIDTH)/8; a++) sBuffer[a] = 0x00;
+
+  // This implimentation should be close to an order of magnitude faster
+  asm volatile(
+    // load sBuffer pointer into Z
+    "movw  r30, %0\n\t"
+    // counter = 0
+    "eor __tmp_reg__, __tmp_reg__ \n\t"
+    "loop:   \n\t"
+    // (4x) push zero into screen buffer,
+    // then increment buffer position
+    "st Z+, __zero_reg__ \n\t"
+    "st Z+, __zero_reg__ \n\t"
+    "st Z+, __zero_reg__ \n\t"
+    "st Z+, __zero_reg__ \n\t"
+    // increase counter
+    "inc __tmp_reg__ \n\t"
+    // repeat for 256 loops
+    // (until counter rolls over back to 0)
+    "brne loop \n\t"
+    // input: sBuffer
+    // modified: Z (r30, r31)
+    : : "r" (sBuffer) : "r30","r31"
+  );
 }
 
 void Arduboy::drawPixel(int x, int y, uint8_t color)
@@ -704,12 +561,14 @@ void Arduboy::drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w,
         if (iCol + x > (WIDTH-1)) break;
         if (iCol + x >= 0) {
           if (bRow >= 0) {
-            if (color) this->sBuffer[ (bRow*WIDTH) + x + iCol  ]  |= pgm_read_byte(bitmap+(a*w)+iCol) << yOffset;
-            else this->sBuffer[ (bRow*WIDTH) + x + iCol  ]  &= ~(pgm_read_byte(bitmap+(a*w)+iCol) << yOffset);
+            if      (color == WHITE) this->sBuffer[ (bRow*WIDTH) + x + iCol ] |= pgm_read_byte(bitmap+(a*w)+iCol) << yOffset;
+            else if (color == BLACK) this->sBuffer[ (bRow*WIDTH) + x + iCol ] &= ~(pgm_read_byte(bitmap+(a*w)+iCol) << yOffset);
+            else                     this->sBuffer[ (bRow*WIDTH) + x + iCol ] ^= pgm_read_byte(bitmap+(a*w)+iCol) << yOffset;
           }
           if (yOffset && bRow<(HEIGHT/8)-1 && bRow > -2) {
-            if (color) this->sBuffer[ ((bRow+1)*WIDTH) + x + iCol  ] |= pgm_read_byte(bitmap+(a*w)+iCol) >> (8-yOffset);
-            else this->sBuffer[ ((bRow+1)*WIDTH) + x + iCol  ] &= ~(pgm_read_byte(bitmap+(a*w)+iCol) >> (8-yOffset));
+            if      (color == WHITE) this->sBuffer[ ((bRow+1)*WIDTH) + x + iCol ] |= pgm_read_byte(bitmap+(a*w)+iCol) >> (8-yOffset);
+            else if (color == BLACK) this->sBuffer[ ((bRow+1)*WIDTH) + x + iCol ] &= ~(pgm_read_byte(bitmap+(a*w)+iCol) >> (8-yOffset));
+            else                     this->sBuffer[ ((bRow+1)*WIDTH) + x + iCol ] ^= pgm_read_byte(bitmap+(a*w)+iCol) >> (8-yOffset);
           }
         }
       }
@@ -836,54 +695,13 @@ size_t Arduboy::write(uint8_t c)
 
 void Arduboy::display()
 {
-  this->drawScreen(sBuffer);
+  this->paintScreen(sBuffer);
 }
 
-void Arduboy::drawScreen(const unsigned char *image)
-{
-#ifdef HELL_WATCH
-  digitalWrite(CS, HIGH);
-  digitalWrite(DC, HIGH);
-  digitalWrite(CS, LOW);
-  for (int a = 0; a < (HEIGHT*WIDTH)/8; a++)
-  {
-    oled_transfer(pgm_read_byte(image + a));
-  }
-  digitalWrite(CS, HIGH);
-#else
-  for (int a = 0; a < (HEIGHT*WIDTH)/8; a++)
-  {
-    SPI.transfer(pgm_read_byte(image + a));
-  }
-#endif
-}
-
-void Arduboy::drawScreen(unsigned char image[])
-{
-#ifdef HELL_WATCH
-  digitalWrite(CS, HIGH);
-  digitalWrite(DC, HIGH);
-  digitalWrite(CS, LOW);
-  for (int a = 0; a < (HEIGHT*WIDTH)/8; a++)
-  {
-    oled_transfer(image[a]);
-  }
-  digitalWrite(CS, HIGH);
-#else
-  for (int a = 0; a < (HEIGHT*WIDTH)/8; a++)
-  {
-    SPI.transfer(image[a]);
-  }
-#endif
-}
-
-inline unsigned char* Arduboy::getBuffer(){
+unsigned char* Arduboy::getBuffer(){
   return sBuffer;
 }
 
-uint8_t Arduboy::width() { return WIDTH; }
-
-uint8_t Arduboy::height() { return HEIGHT; }
 
 // returns true if the button mask passed in is pressed
 //
@@ -902,7 +720,6 @@ boolean Arduboy::not_pressed(uint8_t buttons)
  uint8_t button_state = getInput();
  return (button_state & buttons) == 0;
 }
-
 
 void Arduboy::swap(int16_t& a, int16_t& b) {
   int temp = a;

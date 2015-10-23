@@ -1,13 +1,11 @@
 #ifndef Arduboy_h
 #define Arduboy_h
 
+#include "core.h"
 #include <SPI.h>
 #include <Print.h>
-#include <avr/sleep.h>
-#include <avr/power.h>
 #include <limits.h>
 
-//#define DEVKIT
 
 // EEPROM settings
 
@@ -21,11 +19,7 @@
 #include "audio.h"
 
 #define PIXEL_SAFE_MODE
-#define SAFE_MODE
 
-#define CS 16
-#define DC 18
-#define RST 20
 
 // compare Vcc to 1.1 bandgap
 #define ADC_VOLTAGE _BV(REFS0) | _BV(MUX4) | _BV(MUX3) | _BV(MUX2) | _BV(MUX1)
@@ -33,51 +27,19 @@
 // also _BV(MUX5)
 #define ADC_TEMP _BV(REFS0) | _BV(REFS1) | _BV(MUX2) | _BV(MUX1) | _BV(MUX0)
 
-#define LEFT_BUTTON _BV(5)
-#define RIGHT_BUTTON _BV(2)
-#define UP_BUTTON _BV(4)
-#define DOWN_BUTTON _BV(6)
-#define A_BUTTON _BV(1)
-#define B_BUTTON _BV(0)
-
-#define PIN_LEFT_BUTTON 2 //PE2
-#define PIN_RIGHT_BUTTON 0 //PE0
-#define PIN_UP_BUTTON 4	//PB3
-#define PIN_DOWN_BUTTON 1 //PE1
-#define PIN_A_BUTTON 6 //PB1
-#define PIN_B_BUTTON 7 //PB0
-
 #define PIN_SPEAKER_1 21
 #define PIN_SPEAKER_2 21
 
-#define WIDTH 128
-#define HEIGHT 64
-
-#define WHITE 1
-#define BLACK 0
-
-#define COLUMN_ADDRESS_END (WIDTH - 1) & 0x7F
-#define PAGE_ADDRESS_END ((HEIGHT/8)-1) & 0x07
-
-
-class Arduboy : public Print
+class Arduboy : public Print, public ArduboyCore
 {
 public:
   Arduboy();
-  void LCDDataMode();
-  void LCDCommandMode();
 
-  uint8_t getInput();
   boolean pressed(uint8_t buttons);
   boolean not_pressed(uint8_t buttons);
   void start();
-  void saveMuchPower();
-  void idle();
-  void blank();
   void clearDisplay();
   void display();
-  void drawScreen(const unsigned char *image);
-  void drawScreen(unsigned char image[]);
   void drawPixel(int x, int y, uint8_t color);
   uint8_t getPixel(uint8_t x, uint8_t y);
   void drawCircle(int16_t x0, int16_t y0, int16_t r, uint8_t color);
@@ -100,9 +62,8 @@ public:
   void setCursor(int16_t x, int16_t y);
   void setTextSize(uint8_t s);
   void setTextWrap(boolean w);
-  inline unsigned char* getBuffer();
-  uint8_t width();
-  uint8_t height();
+  unsigned char* getBuffer();
+
   virtual size_t write(uint8_t);
   void initRandomSeed();
   void swap(int16_t& a, int16_t& b);
@@ -112,34 +73,28 @@ public:
 
   void setFrameRate(uint8_t rate);
   bool nextFrame();
+  bool everyXFrames(uint8_t frames);
   int cpuLoad();
-  uint8_t frameRate = 60;
-  uint8_t frameCount = 0;
-  uint8_t eachFrameMillis = 1000/60;
-  long lastFrameStart = 0;
-  long nextFrameStart = 0;
-  bool post_render = false;
-  uint8_t lastFrameDurationMs = 0;
+  uint8_t frameRate;
+  uint16_t frameCount;
+  uint8_t eachFrameMillis;
+  long lastFrameStart;
+  long nextFrameStart;
+  bool post_render;
+  uint8_t lastFrameDurationMs;
 
-private:
+protected:
   unsigned char sBuffer[(HEIGHT*WIDTH)/8];
 
-  void bootLCD() __attribute__((always_inline));
-  void safeMode() __attribute__((always_inline));
-  void slowCPU() __attribute__((always_inline));
   uint8_t readCapacitivePin(int pinToMeasure);
   uint8_t readCapXtal(int pinToMeasure);
   uint16_t rawADC(byte adc_bits);
-  volatile uint8_t *mosiport, *clkport, *csport, *dcport;
-  uint8_t mosipinmask, clkpinmask, cspinmask, dcpinmask;
-#ifdef HELL_WATCH
-  void oled_transfer(uint8_t c);
-#endif
+
 // Adafruit stuff
 protected:
-  int16_t cursor_x = 0;
-  int16_t cursor_y = 0;
-  uint8_t textsize = 1;
+  int16_t cursor_x;
+  int16_t cursor_y;
+  uint8_t textsize;
   boolean wrap; // If set, 'wrap' text at right edge of display
 };
 

@@ -2,7 +2,7 @@
 # Xmegaduino compile variables
 # --------------------- 
 
-name=Hell Prototypes Boards
+name=Hell Prototypes AVR Boards
 version=0.1.0
 
 # AVR compile variables
@@ -57,7 +57,7 @@ recipe.size.regex=Total\s+([0-9]+).*
 # -------------------
 
 # cmd.path : Point to Hell_Watch_Updater.exe file
-tools.Hell_Watch_Updater.cmd.path={runtime.ide.path}/hardware/tools/Hell_Watch_Updater/Hell_Watch_Updater
+tools.Hell_Watch_Updater.cmd.path={runtime.ide.path}/tools/Hell_Watch_Updater/Hell_Watch_Updater
 tools.Hell_Watch_Updater.upload.params.verbose=
 tools.Hell_Watch_Updater.upload.params.quiet=
 tools.Hell_Watch_Updater.upload.pattern="{cmd.path}" "{build.path}/{build.project_name}.hex"

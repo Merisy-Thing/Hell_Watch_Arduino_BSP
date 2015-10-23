@@ -17,7 +17,7 @@ volatile boolean doing_delay = false;          /* are we using it for a tune_del
 volatile boolean tonePlaying = false;
 volatile unsigned long wait_toggle_count;      /* countdown score waits */
 volatile unsigned long delay_toggle_count;     /* countdown tune_ delay() delays */
-volatile boolean tunes_inited = false;
+
 
 // pointers to your musical score and your position in said score
 volatile const byte *score_start = 0;
@@ -84,21 +84,16 @@ void ArduboyAudio::tone(uint8_t channel, unsigned int frequency, unsigned long d
 
 void ArduboyTunes::initChannel(byte pin) {
 #ifdef HELL_WATCH
-	if(tunes_inited) {
-		return;
-	}
-	tunes_inited = true;
+  TCD1.PER = 0xFFFF;
+  TCD1.CCB = 0;
+  TCD1.CTRLB = 0x23;//CCBEN, Single-slope PWM
+  TCD1.CTRLA = 0x01;//DIV1, 16MHz
 
-	TCD1.PER = 0xFFFF;
-	TCD1.CCB = 0;
-	TCD1.CTRLB = 0x23;//CCBEN, Single-slope PWM
-	TCD1.CTRLA = 0x01;//DIV1, 16MHz
-
-	noInterrupts();
-	TCC0.PER = 2999;
-	TCC0.INTCTRLA = 0x01; //lo Pri
-	TCC0.CTRLA = 0x02;//DIV 2, 2M
-	interrupts();
+  noInterrupts();
+  TCC0.PER = 2999;
+  TCC0.INTCTRLA = 0x01; //lo Pri
+  TCC0.CTRLA = 0x02;//DIV 2, 2M
+  interrupts();
 #else
   byte timer_num;
 
