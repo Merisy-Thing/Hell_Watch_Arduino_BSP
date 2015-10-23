@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Aur¨¦lien Rodot. All rights reserved.
+ * (C) Copyright 2014 Aurélien Rodot. All rights reserved.
  *
  * This file is part of the Gamebuino Library (http://gamebuino.com)
  *
@@ -582,10 +582,10 @@ void Gamebuino::readSettings(){
 
 		startMenuTimer = rom_read_byte(SETTINGS_PAGE+OFFSET_START_MENU_TIMER);
 		
-		battery.thresolds[0] = rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_CRITIC);
-		battery.thresolds[1] = rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_LOW);
-		battery.thresolds[2] = rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_MED);
-		battery.thresolds[3] = rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_FULL);
+		battery.thresholds[0] = rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_CRITIC);
+		battery.thresholds[1] = rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_LOW);
+		battery.thresholds[2] = rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_MED);
+		battery.thresholds[3] = rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_FULL);
 	}
 	else{
 		display.contrast = SCR_CONTRAST;
@@ -599,10 +599,10 @@ void Gamebuino::readSettings(){
 		
 		startMenuTimer = START_MENU_TIMER;
 		
-		battery.thresolds[0] = BAT_LVL_CRITIC;
-		battery.thresolds[1] = BAT_LVL_LOW;
-		battery.thresolds[2] = BAT_LVL_MED;
-		battery.thresolds[3] = BAT_LVL_FULL;
+		battery.thresholds[0] = BAT_LVL_CRITIC;
+		battery.thresholds[1] = BAT_LVL_LOW;
+		battery.thresholds[2] = BAT_LVL_MED;
+		battery.thresholds[3] = BAT_LVL_FULL;
 	}
 }
 

@@ -1,14 +1,16 @@
 #include <SPI.h>
 #include <avr/pgmspace.h>
 #include <Gamebuino.h>
+#include <winbondflash.h>
 Gamebuino gb;
+winbondFlashSPI spiFlash;
 
 extern const byte logo[] PROGMEM;
 
 extern const byte font3x5[]; //a small but efficient font (default)
 extern const byte font5x7[]; //a large, comfy font
 
-byte buffer[128];
+byte buffer[128+128];//only first 128B used
 unsigned token;
 char currentGame[9];
 char userName[USERNAME_LENGTH+1];
@@ -42,6 +44,7 @@ const char* const mainMenu[MAINMENU_LENGTH] PROGMEM = {
 void setup(){
   gb.begin();
   gb.titleScreen(logo);
+  spiFlash.begin(_W25Q80,SPI,SS);
   if(!gb.settingsAvailable()){
     restoreSettings();
     Wizard();
@@ -97,30 +100,41 @@ void pressAtoContinue(){
 
 void readSettings(){
   for(byte i=0; i<128; i++){
-    buffer[i] = pgm_read_byte(SETTINGS_PAGE+i);
+    buffer[i] = gb.rom_read_byte(SETTINGS_PAGE+i);
   }
-  token = pgm_read_word(SETTINGS_PAGE);
+  token = gb.rom_read_word(SETTINGS_PAGE);
   for(byte i=0; i<9; i++){
-    currentGame[i] = (char)pgm_read_byte(SETTINGS_PAGE+OFFSET_CURRENTGAME+i);
+    currentGame[i] = (char)gb.rom_read_byte(SETTINGS_PAGE+OFFSET_CURRENTGAME+i);
   }
   for(byte i=0; i<USERNAME_LENGTH; i++){
-    userName[i] = (char)pgm_read_byte(SETTINGS_PAGE+OFFSET_USERNAME+i);
+    userName[i] = (char)gb.rom_read_byte(SETTINGS_PAGE+OFFSET_USERNAME+i);
   }
-  contrast = pgm_read_byte(SETTINGS_PAGE+OFFSET_CONTRAST);
-  backlightMin = pgm_read_byte(SETTINGS_PAGE+OFFSET_BACKLIGHT_MIN);
-  backlightMax = pgm_read_byte(SETTINGS_PAGE+OFFSET_BACKLIGHT_MAX);
-  lightMin = pgm_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MIN);
-  lightMax = pgm_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MAX);
-  volumeMax = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_MAX);
-  volumeDefault = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_DEFAULT);
-  startMenuTimer = pgm_read_byte(SETTINGS_PAGE+OFFSET_START_MENU_TIMER);
-  batteryCritic = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_CRITIC);
-  batteryLow = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_LOW);
-  batteryMed = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_MED);
-  batteryFull = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_FULL);
+  contrast = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_CONTRAST);
+  backlightMin = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_BACKLIGHT_MIN);
+  backlightMax = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_BACKLIGHT_MAX);
+  lightMin = gb.rom_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MIN);
+  lightMax = gb.rom_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MAX);
+  volumeMax = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_MAX);
+  volumeDefault = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_DEFAULT);
+  startMenuTimer = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_START_MENU_TIMER);
+  batteryCritic = gb.rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_CRITIC);
+  batteryLow = gb.rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_LOW);
+  batteryMed = gb.rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_MED);
+  batteryFull = gb.rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_FULL);
+}
+
+void write_flash_page(uint32_t addr, byte *buffer) {
+  while(spiFlash.busy());
+  spiFlash.WE();
+  spiFlash.eraseSector(addr);
+
+  while(spiFlash.busy());
+  spiFlash.WE();
+  spiFlash.writePage(addr, buffer);
 }
 
 void saveSettings(){
+  memset(buffer, 0xFF, 256);
   *(unsigned*)buffer = token;
   strcpy((char*)(&buffer[OFFSET_USERNAME]),userName);
   buffer[OFFSET_CONTRAST] = contrast;

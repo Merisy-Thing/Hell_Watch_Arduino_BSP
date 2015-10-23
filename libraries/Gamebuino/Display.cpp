@@ -15,37 +15,38 @@
  *
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
- 
- Parts of the graphical library come from the great library provided by Adafruit for their Nokia 5110 module which can be found [here](https://github.com/adafruit/Adafruit-PCD8544-Nokia-5110-LCD-library).
-Here is their license :
-
-
-This is the core graphics library for all our displays, providing a common
-set of graphics primitives (points, lines, circles, etc.). It needs to be
-paired with a hardware-specific library for each display device we carry
-(to handle the lower-level functions).
-Adafruit invests time and resources providing this open source code, please
-support Adafruit & open-source hardware by purchasing products from Adafruit!
-Copyright (c) 2013 Adafruit Industries. All rights reserved.
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-- Redistributions of source code must retain the above copyright notice,
-this list of conditions and the following disclaimer.
-- Redistributions in binary form must reproduce the above copyright notice,
-this list of conditions and the following disclaimer in the documentation
-and/or other materials provided with the distribution.
-
-This is a library for our Monochrome Nokia 5110 LCD Displays
-Pick one up today in the adafruit shop!
-------> http://www.adafruit.com/products/338
-These displays use SPI to communicate, 4 or 5 pins are required to
-interface
-Adafruit invests time and resources providing this open source code,
-please support Adafruit and open-source hardware by purchasing
-products from Adafruit!
-Written by Limor Fried/Ladyada for Adafruit Industries.
-BSD license, check license.txt for more information
-All text above, and the splash screen below must be included in any redistribution
+ *  
+ * Parts of the graphical library come from the great library provided by Adafruit
+ * for their Nokia 5110 module which can be found here :
+ * https://github.com/adafruit/Adafruit-PCD8544-Nokia-5110-LCD-library
+ * Here is their license :
+ * 
+ * This is the core graphics library for all our displays, providing a common
+ * set of graphics primitives (points, lines, circles, etc.). It needs to be
+ * paired with a hardware-specific library for each display device we carry
+ * (to handle the lower-level functions).
+ * Adafruit invests time and resources providing this open source code, please
+ * support Adafruit & open-source hardware by purchasing products from Adafruit!
+ * Copyright (c) 2013 Adafruit Industries. All rights reserved.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ * - Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ * - Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ * 
+ * This is a library for our Monochrome Nokia 5110 LCD Displays
+ * Pick one up today in the Adafruit shop!
+ * ------> http://www.adafruit.com/products/338
+ * These displays use SPI to communicate, 4 or 5 pins are required to
+ * interface
+ * Adafruit invests time and resources providing this open source code,
+ * please support Adafruit and open-source hardware by purchasing
+ * products from Adafruit!
+ * Written by Limor Fried/Ladyada for Adafruit Industries.
+ * BSD license, check license.txt for more information
+ * All text above, and the splash screen below must be included in any redistribution
  */
 
 #include "Display.h"
@@ -54,7 +55,7 @@ All text above, and the splash screen below must be included in any redistributi
 extern const uint8_t font3x5[] PROGMEM;
 
 // the memory buffer for the LCD
-uint8_t _displayBuffer[LCDWIDTH * LCDHEIGHT / 8];
+uint8_t _displayBuffer[512];
 
 void Display::begin(int8_t SCLK, int8_t DIN, int8_t DC, int8_t CS, int8_t _RST) {
     din = DIN;
@@ -71,7 +72,7 @@ void Display::begin(int8_t SCLK, int8_t DIN, int8_t DC, int8_t CS, int8_t _RST) 
 	setFont(font3x5);
 	//persistence = false;
 #ifdef HELL_WATCH
-	USARTD0.BAUDCTRLA = 0x00;//speed up spi rate to 8M bps
+	USARTD0.BAUDCTRLA = 0x00;//speed up spi rate to 6M bps
 
 	//Clear screen
 	command(0x00 | 0x0);  // low col = 0

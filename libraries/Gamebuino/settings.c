@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Aur¨¦lien Rodot. All rights reserved.
+ * (C) Copyright 2014 Aurélien Rodot. All rights reserved.
  *
  * This file is part of the Gamebuino Library (http://gamebuino.com)
  *
@@ -28,7 +28,7 @@
 //SETTINGS YOU CAN EDIT
 
 #define NUM_CHANNELS 1 //number of sound channels, between 0 and 4
-#define DISPLAY_ROT NOROT //set to NOROT, ROTCCW, ROT180 or ROTCW
+#define DISPLAY_ROT NOROT //set to NOROT, ROTCCW, ROT180 or ROTCW. Can be used to play in portrait mode.
 #define ENABLE_GUI 1 //enable menu, keyboard, pop-up, volume adjust functions
 #define ENABLE_BITMAPS 1 //will replace bitmaps with rectangles if disabled
 #define ENABLE_GRAYSCALE 1 //allows the use of the GRAY color
@@ -48,7 +48,7 @@
 #ifdef HELL_WATCH
 #define SETTINGS_PAGE ((uint32_t)0x3F000)//last sector in data memory 256-4
 #else
-#define SETTINGS_PAGE ((const char *)(0x7000-128))
+#define SETTINGS_PAGE ((const char *)(0x7800-128))
 #endif
 #define SETTINGS_TOKEN 			0xC001
 #define OFFSET_CURRENTGAME		2
