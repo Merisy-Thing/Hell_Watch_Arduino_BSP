@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Aur®¶lien Rodot. All rights reserved.
+ * (C) Copyright 2014 Aur√©lien Rodot. All rights reserved.
  *
  * This file is part of the Gamebuino Library (http://gamebuino.com)
  *
@@ -32,7 +32,6 @@ public:
     boolean held(uint8_t button, uint8_t time);
     boolean repeat(uint8_t button, uint8_t period);
     uint8_t timeHeld(uint8_t button);
-private:
     uint8_t pins[NUM_BTN];
     uint8_t states[NUM_BTN];
 

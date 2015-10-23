@@ -37,6 +37,7 @@ void Battery::begin() {
 
 void Battery::update() {
 #if (ENABLE_BATTERY > 0)
+	if(thresholds[0] == 0) return;
     if (!(nextUpdate % 32)) { //every 32 frames
     #ifdef HELL_WATCH
 		uint8_t old_ref = ADCA.REFCTRL;
@@ -53,7 +54,7 @@ void Battery::update() {
         //set the battery 'level' according to thresholds
         level = NUM_LVL;
             for (uint8_t i = 0; i < NUM_LVL; i++) {
-                if (voltage < thresolds[i]) {
+                if (voltage < thresholds[i]) {
                     level = i;
                     return;
                 }

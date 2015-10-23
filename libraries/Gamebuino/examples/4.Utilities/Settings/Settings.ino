@@ -1,13 +1,14 @@
 #include <SPI.h>
 #include <avr/pgmspace.h>
 #include <Gamebuino.h>
-#include <winbondflash.h>
 Gamebuino gb;
-winbondFlashSPI spiFlash;
 
 extern const byte logo[] PROGMEM;
 
-byte buffer[128+128];//only first 128B used
+extern const byte font3x5[]; //a small but efficient font (default)
+extern const byte font5x7[]; //a large, comfy font
+
+byte buffer[128];
 unsigned token;
 char currentGame[9];
 char userName[USERNAME_LENGTH+1];
@@ -21,25 +22,29 @@ int volumeDefault;
 int startMenuTimer;
 int batteryCritic, batteryLow, batteryMed, batteryFull;
 
+const char strWizard[] PROGMEM = "Checkup Wizard";
 const char strChangeSettings[] PROGMEM =  "Change settings";
 const char strSeeAllSettings[] PROGMEM =  "See all settings";
 const char strDefaultSettings[] PROGMEM = "Default settings";
-const char strEraseSettings[] PROGMEM =   "Erase settings";
+const char strEraseSettings[] PROGMEM =   "Erase settings page";
+const char strSaveSettings[] PROGMEM =   "Save changes";
 
-#define MAINMENU_LENGTH 4
+#define MAINMENU_LENGTH 6
 const char* const mainMenu[MAINMENU_LENGTH] PROGMEM = {
+  strWizard,
   strChangeSettings,
   strSeeAllSettings,
   strDefaultSettings,
   strEraseSettings,
+  strSaveSettings
 };
 
 void setup(){
   gb.begin();
   gb.titleScreen(logo);
-  spiFlash.begin(_W25Q80,SPI,SS);
   if(!gb.settingsAvailable()){
     restoreSettings();
+    Wizard();
     saveSettings();
   }
   readSettings();
@@ -50,21 +55,25 @@ void loop(){
   case -1:
     gb.titleScreen(logo);
     break;
-  case 0: //change settings
-    changeSettings();
+  case 0:
+    Wizard();
+    saveSettings();
     break;
-  case 1: //display settings
+  case 1: //change settings
+    changeSettings();
+    saveSettings();
+    break;
+  case 2: //display settings
     seeAllSettings();
     break;
-  case 2: //default settings
+  case 3: //default settings
     restoreSettings();
     break;
-  case 3: //erase settings
+  case 4: //erase settings
     eraseSettings();
     break;
-  case 4: //save and exit
+  case 5: //save and exit
     saveSettings();
-    gb.changeGame();
     break;
   default:
     break;
@@ -88,41 +97,30 @@ void pressAtoContinue(){
 
 void readSettings(){
   for(byte i=0; i<128; i++){
-    buffer[i] = gb.rom_read_byte(SETTINGS_PAGE+i);
+    buffer[i] = pgm_read_byte(SETTINGS_PAGE+i);
   }
-  token = gb.rom_read_word(SETTINGS_PAGE);
+  token = pgm_read_word(SETTINGS_PAGE);
   for(byte i=0; i<9; i++){
-    currentGame[i] = (char)gb.rom_read_byte(SETTINGS_PAGE+OFFSET_CURRENTGAME+i);
+    currentGame[i] = (char)pgm_read_byte(SETTINGS_PAGE+OFFSET_CURRENTGAME+i);
   }
   for(byte i=0; i<USERNAME_LENGTH; i++){
-    userName[i] = (char)gb.rom_read_byte(SETTINGS_PAGE+OFFSET_USERNAME+i);
+    userName[i] = (char)pgm_read_byte(SETTINGS_PAGE+OFFSET_USERNAME+i);
   }
-  contrast = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_CONTRAST);
-  backlightMin = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_BACKLIGHT_MIN);
-  backlightMax = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_BACKLIGHT_MAX);
-  lightMin = gb.rom_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MIN);
-  lightMax = gb.rom_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MAX);
-  volumeMax = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_MAX);
-  volumeDefault = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_DEFAULT);
-  startMenuTimer = gb.rom_read_byte(SETTINGS_PAGE+OFFSET_START_MENU_TIMER);
-  batteryCritic = gb.rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_CRITIC);
-  batteryLow = gb.rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_LOW);
-  batteryMed = gb.rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_MED);
-  batteryFull = gb.rom_read_word(SETTINGS_PAGE+OFFSET_BATTERY_FULL);
-}
-
-void write_flash_page(uint32_t addr, byte *buffer) {
-  while(spiFlash.busy());
-  spiFlash.WE();
-  spiFlash.eraseSector(addr);
-
-  while(spiFlash.busy());
-  spiFlash.WE();
-  spiFlash.writePage(addr, buffer);
+  contrast = pgm_read_byte(SETTINGS_PAGE+OFFSET_CONTRAST);
+  backlightMin = pgm_read_byte(SETTINGS_PAGE+OFFSET_BACKLIGHT_MIN);
+  backlightMax = pgm_read_byte(SETTINGS_PAGE+OFFSET_BACKLIGHT_MAX);
+  lightMin = pgm_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MIN);
+  lightMax = pgm_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MAX);
+  volumeMax = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_MAX);
+  volumeDefault = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_DEFAULT);
+  startMenuTimer = pgm_read_byte(SETTINGS_PAGE+OFFSET_START_MENU_TIMER);
+  batteryCritic = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_CRITIC);
+  batteryLow = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_LOW);
+  batteryMed = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_MED);
+  batteryFull = pgm_read_word(SETTINGS_PAGE+OFFSET_BATTERY_FULL);
 }
 
 void saveSettings(){
-  memset(buffer, 0xFF, 256);
   *(unsigned*)buffer = token;
   strcpy((char*)(&buffer[OFFSET_USERNAME]),userName);
   buffer[OFFSET_CONTRAST] = contrast;
@@ -138,23 +136,16 @@ void saveSettings(){
   *(unsigned*)(&buffer[OFFSET_BATTERY_MED]) = batteryMed;
   *(unsigned*)(&buffer[OFFSET_BATTERY_FULL]) = batteryFull;
 
-  write_flash_page (SETTINGS_PAGE, buffer);  
-  
-  gb.display.clear();
-  gb.display.update();
-  gb.display.persistence = true;
-  gb.display.println(F("Settings saved"));
-  pressAtoContinue();
+  write_flash_page (SETTINGS_PAGE, buffer);
+
+  gb.popup(F("Settings saved"), 40);
 }
 
 void eraseSettings(){
-  memset(buffer, 0xFF, 256);
+  memset(buffer, 0, 128);
   write_flash_page (SETTINGS_PAGE, buffer);
 
-  gb.display.clear();
-  gb.display.update();
-  gb.display.persistence = true;
-  gb.display.println(F("Settings page erased."));
-  pressAtoContinue();
+  gb.popup(F("Page erased"), 40);
 }
+
 

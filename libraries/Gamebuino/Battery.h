@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Aur®¶lien Rodot. All rights reserved.
+ * (C) Copyright 2014 Aur√©lien Rodot. All rights reserved.
  *
  * This file is part of the Gamebuino Library (http://gamebuino.com)
  *
@@ -38,7 +38,7 @@ public:
 	boolean show;
     uint8_t  level;
     uint16_t voltage;
-    uint16_t thresolds[NUM_LVL];
+    uint16_t thresholds[NUM_LVL];
     uint8_t  nextUpdate;
 };
 
