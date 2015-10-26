@@ -60,6 +60,8 @@ static const uint8_t SCL 	= 9;
 
 #define RTC_MPU_INT			27	//Pulled UP, Active: Low Level
 
+#define KEY_MAIN			29
+
 #define SPI_PORT			SPIC
 
 #define SPI_MOSI			13
