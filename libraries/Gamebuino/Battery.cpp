@@ -22,6 +22,8 @@
 void Battery::begin() {
 #if (ENABLE_BATTERY > 0)
 #ifdef HELL_WATCH
+	ADCA.CTRLA		  = 0x01;	// Enable ADC
+
 	ADCA.CH0.MUXCTRL  = 0x00;	// Channel 0 input: ADC0 pin
 	ADCA.CH0.CTRL	  = 0x01;	// Single-ended positive input signal
 
