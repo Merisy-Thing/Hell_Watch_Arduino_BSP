@@ -98,6 +98,14 @@ void delay(unsigned long ms)
 	while (millis() - start <= ms);
 }
 
+void main_key_ISR(void)
+{
+	PORTD.OUTCLR = 1 << 4;//Rest OLED
+	PORTA.OUTCLR = 1 << 2;//OLED Power OFF
+	PORTA.OUTCLR = 1 << 6;//LDO lock disable
+	while(1);//wait loop for key main release
+}
+
 void init()
 {
 	//Use TCE0 for millis etc.(0.5uS)
@@ -107,6 +115,8 @@ void init()
 
 	//Power save for adc key
 	ADCA.CTRLA = 0x00;
+	
+	attachInterrupt(29, main_key_ISR, RISING);
 
 	/* Enable interrupts.                */
 	PMIC.CTRL |= PMIC_LOLVLEN_bm | PMIC_MEDLVLEN_bm | PMIC_HILVLEN_bm;

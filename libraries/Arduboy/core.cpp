@@ -283,7 +283,32 @@ void ArduboyCore::blank()
 uint8_t ArduboyCore::getInput()
 {
 #ifdef HELL_WATCH
-  return 0;
+  uint8_t PortE, PortB, pin = 0;
+
+  PortE = ~PORTE.IN;
+  PortB = ~PORTB.IN;
+  
+  if(PortB & 0x01) {
+	  pin |= B_BUTTON;
+  }
+  if(PortB & 0x02) {
+	  pin |= A_BUTTON;
+  }
+  if(PortB & 0x08) {
+	  pin |= UP_BUTTON;
+  }
+  
+  if(PortE & 0x01) {
+	  pin |= RIGHT_BUTTON;
+  }
+  if(PortE & 0x02) {
+	  pin |= DOWN_BUTTON;
+  }
+  if(PortE & 0x04) {
+	  pin |= LEFT_BUTTON;
+  }
+  
+  return pin;
 #else
   // using ports here is ~100 bytes smaller than digitalRead()
   #ifdef DEVKIT

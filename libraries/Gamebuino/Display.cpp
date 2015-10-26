@@ -198,7 +198,7 @@ void Display::data(uint8_t c) {
 
 void Display::setContrast(uint8_t val) {
 #ifdef HELL_WATCH
-	//FIXME
+
 #else
 	contrast = constrain(val, 30, 80);
     /*if (contrast > 0x7f) {
