@@ -1,3 +1,0 @@
-[submodule "libraries\\Arduboy"]
-	path = libraries\\Arduboy
-	url = git@git.oschina.net:hell-prototypes/Hell_Watch_Arduboy_Lib.git
