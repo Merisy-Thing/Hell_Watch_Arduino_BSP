@@ -58,8 +58,9 @@ void Gamebuino::begin() {
 	display.begin(SCR_CLK, SCR_DIN, SCR_DC, SCR_CS, SCR_RST);
 	sound.begin();
 	
-	//mute when B is held during start up
-	if(buttons.pressed(BTN_B)){
+	//mute when B is held during start up or if battery is low
+	battery.update();
+	if(buttons.pressed(BTN_B) || (battery.level == 0)){
 		sound.setVolume(0);
 	}
 	else{ //play the startup sound on each channel for it to be louder
@@ -140,7 +141,7 @@ void Gamebuino::titleScreen(const __FlashStringHelper*  name, const uint8_t *log
 				
 				//toggle volume when B is pressed
 				if(buttons.pressed(BTN_B)){
-					sound.setVolume(sound.globalVolume+1);
+					sound.setVolume(sound.getVolume() + 1);
 					sound.playTick();
 				}
 				//leave the menu
@@ -175,6 +176,22 @@ boolean Gamebuino::update() {
 
 	} else {
 		if (!frameEndMicros) { //runs once at the end of the frame
+		
+			//increase volume shortcut : hold C + press B
+			if(buttons.repeat(BTN_C, 1) && buttons.pressed(BTN_B)){
+				sound.setVolume(sound.getVolume() + 1);
+				popup(F("\027+\026 \23\24"), 60);
+				sound.playTick();
+			}
+			
+			//flash loader shortcut : hold C + A
+			if(buttons.repeat(BTN_C, 1) && buttons.pressed(BTN_A)){
+				popup(F("\027+\025 \020 LOADER"), 60);
+			}
+			if(buttons.repeat(BTN_C, 1) && buttons.held(BTN_A,40)){
+				changeGame();
+			}
+		
 			sound.updateTrack();
 			sound.updatePattern();
 			sound.updateNote();
@@ -632,7 +649,9 @@ void Gamebuino::readSettings(){
 		backlight.ambientLightMin = pgm_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MIN);
 		backlight.ambientLightMax = pgm_read_word(SETTINGS_PAGE+OFFSET_LIGHT_MAX);
 		
-		sound.volumeMax = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_MAX);
+		//sound.volumeMax = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_MAX);
+		sound.volumeMax = VOLUME_GLOBAL_MAX; //max volume is no longer read from settings
+		
 		sound.globalVolume = pgm_read_byte(SETTINGS_PAGE+OFFSET_VOLUME_DEFAULT);
 
 		startMenuTimer = pgm_read_byte(SETTINGS_PAGE+OFFSET_START_MENU_TIMER);

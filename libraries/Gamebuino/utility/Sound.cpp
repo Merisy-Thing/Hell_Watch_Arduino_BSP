@@ -446,7 +446,7 @@ void Sound::updateNote(uint8_t i) {
 		}
 		noInterrupts();
 		_chanHalfPeriod[i] = pgm_read_byte(_halfPeriods + outputPitch[i]);
-		_chanOutput[i] = _chanOutputVolume[i] = outputVolume[i] * globalVolume * chanVolumes[i] * stepVolume[i];
+		_chanOutput[i] = _chanOutputVolume[i] = (int(outputVolume[i] * chanVolumes[i] * stepVolume[i]) << (globalVolume)) / 128;
 		//Serial.println(outputVolume[i]);
 		interrupts();
 	}
@@ -464,15 +464,16 @@ void Sound::setChannelHalfPeriod(uint8_t channel, uint8_t halfPeriod) {
 #endif
 }
 
+#if(NUM_CHANNELS > 0)
 #ifdef HELL_WATCH
 ISR(TCC0_OVF_vect) {
 #else
 ISR(TIMER1_COMPA_vect){ // timer compare interrupt service routine
 #endif
-#if(NUM_CHANNELS > 0)
 	Sound::generateOutput();
-#endif
 }
+#endif
+
 
 void Sound::generateOutput() {
 #if(NUM_CHANNELS > 0)
@@ -612,7 +613,7 @@ void Sound::playTick(){
 
 void Sound::setVolume(int8_t volume) {
 #if NUM_CHANNELS > 0
-	globalVolume = volume % (volumeMax+1);
+	globalVolume = (volume < 0) ? volumeMax : volume % (volumeMax+1); //wrap volume value
 #endif
 }
 

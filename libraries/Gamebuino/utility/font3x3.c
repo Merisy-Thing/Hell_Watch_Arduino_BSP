@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2014 Aur®¶lien Rodot. All rights reserved.
+ * (C) Copyright 2014 Aur√©lien Rodot. All rights reserved.
  *
  * This file is part of the Gamebuino Library (http://gamebuino.com)
  *
