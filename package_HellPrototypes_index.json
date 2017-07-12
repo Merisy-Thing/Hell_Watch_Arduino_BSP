@@ -14,7 +14,7 @@
           "architecture": "xmega",
           "version": "1.0.0",
           "category": "Hell-Prototypes",
-          "url": "http://www.hellprototypes.com/Hell-Watch/hell-watch-arduino-1.0.0.zip",
+          "url": "https://github.com/hellprototypes/Hell_Watch_Arduino_BSP/releases/download/v1.0.0/hell-watch-arduino-1.0.0.zip",
           "archiveFileName": "hell-watch-arduino-1.0.0.zip",
           "checksum": "SHA-256:4CE280CA45C9AD9835277BDF9642D150963E45666C8AE42188C60D98A0E73ACD",
           "size": "400762",
